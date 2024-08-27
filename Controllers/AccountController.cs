@@ -48,53 +48,23 @@ namespace JwtBasedWebAuthorization.Controllers
 
                 var authClaims = new List<Claim>
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(JwtRegisteredClaimNames.Sub,user.UserName!),
+                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                 };
 
                 authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
                 var token = new JwtSecurityToken(
-                    issuer: _configuration["Jwt:Issuer"],
-                    expires: DateTime.Now.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
-                    SecurityAlgorithms.HmacSha256));
+                        issuer: _configuration["Jwt:Issuer"],
+                        expires: DateTime.Now.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
+                        claims: authClaims,
+                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
+                        SecurityAlgorithms.HmacSha256));
 
                 return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
             }
-
             return Unauthorized();
         }
-
-        //[HttpPost("login")]
-        //public async Task<IActionResult> Login([FromBody] Login model)
-        //{
-        //    var user = await _userManager.FindByNameAsync(model.Username);
-        //    if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-        //    {
-        //        var userRoles = await _userManager.GetRolesAsync(user);
-
-        //        var authClaims = new List<Claim>
-        //        {
-        //            new Claim(JwtRegisteredClaimNames.Sub,user.UserName!),
-        //            new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-        //        };
-
-        //        authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        //        var token = new JwtSecurityToken(
-        //                issuer: _configuration["Jwt:Issuer"],
-        //                expires: DateTime.Now.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
-        //                claims: authClaims,
-        //                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
-        //                SecurityAlgorithms.HmacSha256)
-        //            );
-
-        //        return Ok(new { Token = new JwtSecurityTokenHandler().WriteToken(token) });
-        //    }
-        //    return Unauthorized();
-        //}
 
         [HttpPost("add-role")]
         public async Task<IActionResult> AddRole([FromBody]string role)
